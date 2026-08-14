@@ -163,7 +163,28 @@
 				<column name="ACCOUNT_SK" />
 			</index>
 		</table>
-		<table name="DIM_SECURITY" prior="DIM_ADVISOR_TEAM_0" >
+		<table name="DIM_KNOW_YOUR_CLIENT" >
+			<column name="KYC_SK" type="DATE" mandatory="y" />
+			<column name="CLIENT_SK" type="DATE" mandatory="y" />
+			<column name="EFFECTIVE_START_DATE" type="DATE" mandatory="y" />
+			<column name="EFFECTIVE_END_DATE" type="DATE" />
+			<column name="CURRENT_FLAG" type="BOOLEAN" mandatory="y" />
+			<column name="KYC_STATUS" type="VARCHAR" mandatory="y" />
+			<column name="RISK_RATING" type="VARCHAR" />
+			<column name="PEP_FLAG" type="BOOLEAN" />
+			<column name="SANCTIONS_SCREENING_STATUS" type="VARCHAR" />
+			<column name="SOURCE_OF_WEALTH" type="VARCHAR" />
+			<column name="IDENTITY_VERIFICATION_METHOD" type="VARCHAR" />
+			<column name="LAST_REVIEW_DATE" type="DATE" />
+			<column name="NEXT_REVIEW_DATE" type="DATE" />
+			<index name="pk_DIM_KNOW_YOUR_CLIENT" unique="PRIMARY_KEY" >
+				<column name="KYC_SK" />
+			</index>
+			<fk name="fk_DIM_KNOW_YOUR_CLIENT_CLIENT" to_schema="DIMS" to_table="DIM_CLIENT" type="NonIdentifying" mandatory="y" cardinality="ZeroMore" range_from="0" range_to="0" >
+				<fk_column name="CLIENT_SK" pk="CLIENT_SK" />
+			</fk>
+		</table>
+<table name="DIM_SECURITY" prior="DIM_ADVISOR_TEAM_0" >
 			<column name="SECURITY_SK" prior="ADVISOR_TEAM_SK" type="DATE" mandatory="y" />
 			<column name="EFFECTIVE_START_DATE" type="DATE" mandatory="y" />
 			<column name="EFFECTIVE_END_DATE" type="DATE" />
