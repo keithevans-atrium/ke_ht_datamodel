@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="Data_Product" database="LogicalDesign" id="d3204e50-50eb-4357-9204-670bc1782d99" >
+	<schema name="DIMS" >
+		<table name="DIM_HT_FINANCIAL_ACCOUNT" >
+			<column name="ACCOUNT_SK" type="DATE" mandatory="y" />
+			<column name="EFFECTIVE_START_DATE" type="DATE" mandatory="y" />
+			<column name="EFFECTIVE_END_DATE" type="DATE" mandatory="n" />
+			<column name="CURRENT_FLAG" type="BOOLEAN" mandatory="y" />
+			<index name="pk_DIM_DATE_2" unique="PRIMARY_KEY" >
+				<column name="ACCOUNT_SK" />
+			</index>
+		</table>
+		<table name="DIM_AGREEMENT_ACCOUNT" >
+			<column name="ACCOUNT_AGREEMENT_SK" type="DATE" mandatory="y" />
+			<column name="EFFECTIVE_START_DATE" type="DATE" mandatory="y" />
+			<column name="EFFECTIVE_END_DATE" type="DATE" mandatory="n" />
+			<column name="CURRENT_FLAG" type="BOOLEAN" mandatory="y" />
+			<index name="pk_DIM_DATE_3" unique="PRIMARY_KEY" >
+				<column name="ACCOUNT_AGREEMENT_SK" />
+			</index>
+		</table>
+		<table name="DIM_ADVISOR_TEAM" >
+			<column name="ADVISOR_TEAM_SK" type="DATE" mandatory="y" />
+			<column name="EFFECTIVE_START_DATE" type="DATE" mandatory="y" />
+			<column name="EFFECTIVE_END_DATE" type="DATE" mandatory="n" />
+			<column name="CURRENT_FLAG" type="BOOLEAN" mandatory="y" />
+			<index name="pk_DIM_DATE_5" unique="PRIMARY_KEY" >
+				<column name="ADVISOR_TEAM_SK" />
+			</index>
+		</table>
+		<!-- No DP maps to a standalone client dim (only DP-04 Client Agreement). Kept as-is pending decision: keep / rename / drop. -->
+		<table name="DIM_CLIENT" >
+			<column name="CLIENT_SK" type="DATE" mandatory="y" />
+			<column name="EFFECTIVE_START_DATE" type="DATE" mandatory="y" />
+			<column name="EFFECTIVE_END_DATE" type="DATE" mandatory="n" />
+			<column name="CURRENT_FLAG" type="BOOLEAN" mandatory="y" />
+			<index name="pk_DIM_DATE_0" unique="PRIMARY_KEY" >
+				<column name="CLIENT_SK" />
+			</index>
+		</table>
+		<table name="DIM_CLIENT_AGREEMENT" >
+			<column name="CLIENT_AGREEMENT_SK" type="DATE" mandatory="y" />
+			<column name="EFFECTIVE_START_DATE" type="DATE" mandatory="y" />
+			<column name="EFFECTIVE_END_DATE" type="DATE" mandatory="n" />
+			<column name="CURRENT_FLAG" type="BOOLEAN" mandatory="y" />
+			<index name="pk_DIM_DATE_4" unique="PRIMARY_KEY" >
+				<column name="CLIENT_AGREEMENT_SK" />
+			</index>
+		</table>
+		<table name="DIM_DATE" >
+			<column name="DATE_SK" type="DATE" mandatory="y" />
+			<index name="pk_DIM_DATE" unique="PRIMARY_KEY" >
+				<column name="DATE_SK" />
+			</index>
+		</table>
+		<table name="DIM_HOUSEHOLD" >
+			<column name="HOUSEHOLD_SK" type="DATE" mandatory="y" />
+			<column name="EFFECTIVE_START_DATE" type="DATE" mandatory="y" />
+			<column name="EFFECTIVE_END_DATE" type="DATE" mandatory="n" />
+			<column name="CURRENT_FLAG" type="BOOLEAN" mandatory="y" />
+			<index name="pk_DIM_DATE_1" unique="PRIMARY_KEY" >
+				<column name="HOUSEHOLD_SK" />
+			</index>
+		</table>
+		<table name="DIM_ASSET" >
+			<column name="SECURITY_SK" type="DATE" mandatory="y" />
+			<column name="EFFECTIVE_START_DATE" type="DATE" mandatory="y" />
+			<column name="EFFECTIVE_END_DATE" type="DATE" mandatory="n" />
+			<column name="CURRENT_FLAG" type="BOOLEAN" mandatory="y" />
+			<index name="pk_DIM_SECURITY" unique="PRIMARY_KEY" >
+				<column name="SECURITY_SK" />
+			</index>
+		</table>
+		<!-- DP-07: DDL pending (proposed source: Black Diamond provider reference) -->
+		<table name="DIM_DATAPROVIDER" >
+			<column name="DATAPROVIDER_SK" type="DATE" mandatory="y" />
+			<column name="EFFECTIVE_START_DATE" type="DATE" mandatory="y" />
+			<column name="EFFECTIVE_END_DATE" type="DATE" mandatory="n" />
+			<column name="CURRENT_FLAG" type="BOOLEAN" mandatory="y" />
+			<index name="pk_DIM_DATAPROVIDER" unique="PRIMARY_KEY" >
+				<column name="DATAPROVIDER_SK" />
+			</index>
+		</table>
+		<!-- DP-08: proposed (source: custodian master / normalized custodian reference) -->
+		<table name="DIM_CUSTODIAN" >
+			<column name="CUSTODIAN_SK" type="DATE" mandatory="y" />
+			<column name="EFFECTIVE_START_DATE" type="DATE" mandatory="y" />
+			<column name="EFFECTIVE_END_DATE" type="DATE" mandatory="n" />
+			<column name="CURRENT_FLAG" type="BOOLEAN" mandatory="y" />
+			<index name="pk_DIM_CUSTODIAN" unique="PRIMARY_KEY" >
+				<column name="CUSTODIAN_SK" />
+			</index>
+		</table>
+	</schema>
+	<schema name="FACTS" >
+		<!-- Unmapped to any DP as-is; grain/purpose overlap with DP-09 and/or DP-15 still needs a decision -->
+		<table name="FACT_ACCOUNT_VALUE_DAILY" >
+			<column name="ACCOUNT_SK" type="DATE" mandatory="y" />
+			<column name="DATE_SK" type="DATE" mandatory="y" />
+			<column name="ACCOUNT_VALUE" type="NUMBER" mandatory="y" />
+			<index name="pk_FACT_ACCOUNT_VALUE_DAILY" unique="PRIMARY_KEY" >
+				<column name="ACCOUNT_SK" />
+				<column name="DATE_SK" />
+			</index>
+			<fk name="fk_FACT_ACCOUNT_VALUE_DAILY_ACCOUNT" to_schema="DIMS" to_table="DIM_HT_FINANCIAL_ACCOUNT" >
+				<fk_column name="ACCOUNT_SK" pk="ACCOUNT_SK" />
+			</fk>
+			<fk name="fk_FACT_ACCOUNT_VALUE_DAILY_DATE" to_schema="DIMS" to_table="DIM_DATE" >
+				<fk_column name="DATE_SK" pk="DATE_SK" />
+			</fk>
+		</table>
+		<!-- Unmapped to any DP as-is; DP-09 target grain is daily (FACT_DAILY_POSITION below), this table is monthly -->
+		<table name="FACT_POSITIONS_MONTHLY" >
+			<column name="ACCOUNT_SK" type="DATE" mandatory="y" />
+			<column name="SECURITY_SK" type="DATE" mandatory="y" />
+			<column name="DATE_SK" type="DATE" mandatory="y" />
+			<column name="QUANTITY" type="NUMBER" mandatory="y" />
+			<column name="MARKET_VALUE" type="NUMBER" mandatory="y" />
+			<column name="COST_BASIS" type="NUMBER" mandatory="n" />
+			<index name="pk_FACT_POSITIONS_MONTHLY" unique="PRIMARY_KEY" >
+				<column name="ACCOUNT_SK" />
+				<column name="SECURITY_SK" />
+				<column name="DATE_SK" />
+			</index>
+			<fk name="fk_FACT_POSITIONS_MONTHLY_ACCOUNT" to_schema="DIMS" to_table="DIM_HT_FINANCIAL_ACCOUNT" >
+				<fk_column name="ACCOUNT_SK" pk="ACCOUNT_SK" />
+			</fk>
+			<fk name="fk_FACT_POSITIONS_MONTHLY_SECURITY" to_schema="DIMS" to_table="DIM_ASSET" >
+				<fk_column name="SECURITY_SK" pk="SECURITY_SK" />
+			</fk>
+			<fk name="fk_FACT_POSITIONS_MONTHLY_DATE" to_schema="DIMS" to_table="DIM_DATE" >
+				<fk_column name="DATE_SK" pk="DATE_SK" />
+			</fk>
+		</table>
+		<!-- DP-09: Daily Position Snapshot (source: Black Diamond DailyHoldingValues) -->
+		<table name="FACT_DAILY_POSITION" >
+			<column name="ACCOUNT_SK" type="DATE" mandatory="y" />
+			<column name="SECURITY_SK" type="DATE" mandatory="y" />
+			<column name="DATE_SK" type="DATE" mandatory="y" />
+			<column name="QUANTITY" type="NUMBER" mandatory="y" />
+			<column name="MARKET_VALUE" type="NUMBER" mandatory="y" />
+			<column name="COST_BASIS" type="NUMBER" mandatory="n" />
+			<index name="pk_FACT_DAILY_POSITION" unique="PRIMARY_KEY" >
+				<column name="ACCOUNT_SK" />
+				<column name="SECURITY_SK" />
+				<column name="DATE_SK" />
+			</index>
+			<fk name="fk_FACT_DAILY_POSITION_ACCOUNT" to_schema="DIMS" to_table="DIM_HT_FINANCIAL_ACCOUNT" >
+				<fk_column name="ACCOUNT_SK" pk="ACCOUNT_SK" />
+			</fk>
+			<fk name="fk_FACT_DAILY_POSITION_SECURITY" to_schema="DIMS" to_table="DIM_ASSET" >
+				<fk_column name="SECURITY_SK" pk="SECURITY_SK" />
+			</fk>
+			<fk name="fk_FACT_DAILY_POSITION_DATE" to_schema="DIMS" to_table="DIM_DATE" >
+				<fk_column name="DATE_SK" pk="DATE_SK" />
+			</fk>
+		</table>
+		<!-- DP-10: Transaction Activity (source: Black Diamond Transactions) -->
+		<table name="FACT_TRANSACTION_ACTIVITY" >
+			<column name="TRANSACTION_SK" type="DATE" mandatory="y" />
+			<column name="ACCOUNT_SK" type="DATE" mandatory="y" />
+			<column name="SECURITY_SK" type="DATE" mandatory="n" />
+			<column name="DATE_SK" type="DATE" mandatory="y" />
+			<column name="TRANSACTION_TYPE" type="VARCHAR" mandatory="y" />
+			<column name="TRANSACTION_AMOUNT" type="NUMBER" mandatory="y" />
+			<column name="QUANTITY" type="NUMBER" mandatory="n" />
+			<index name="pk_FACT_TRANSACTION_ACTIVITY" unique="PRIMARY_KEY" >
+				<column name="TRANSACTION_SK" />
+			</index>
+			<fk name="fk_FACT_TRANSACTION_ACTIVITY_ACCOUNT" to_schema="DIMS" to_table="DIM_HT_FINANCIAL_ACCOUNT" >
+				<fk_column name="ACCOUNT_SK" pk="ACCOUNT_SK" />
+			</fk>
+			<fk name="fk_FACT_TRANSACTION_ACTIVITY_SECURITY" to_schema="DIMS" to_table="DIM_ASSET" >
+				<fk_column name="SECURITY_SK" pk="SECURITY_SK" />
+			</fk>
+			<fk name="fk_FACT_TRANSACTION_ACTIVITY_DATE" to_schema="DIMS" to_table="DIM_DATE" >
+				<fk_column name="DATE_SK" pk="DATE_SK" />
+			</fk>
+		</table>
+		<!-- DP-11: Open Tax Lot Snapshot (source: Black Diamond UGLData) -->
+		<table name="FACT_OPEN_TAX_LOT" >
+			<column name="TAX_LOT_SK" type="DATE" mandatory="y" />
+			<column name="ACCOUNT_SK" type="DATE" mandatory="y" />
+			<column name="SECURITY_SK" type="DATE" mandatory="y" />
+			<column name="DATE_SK" type="DATE" mandatory="y" />
+			<column name="OPEN_DATE" type="DATE" mandatory="n" />
+			<column name="QUANTITY" type="NUMBER" mandatory="y" />
+			<column name="COST_BASIS" type="NUMBER" mandatory="n" />
+			<column name="UNREALIZED_GAIN_LOSS" type="NUMBER" mandatory="n" />
+			<index name="pk_FACT_OPEN_TAX_LOT" unique="PRIMARY_KEY" >
+				<column name="TAX_LOT_SK" />
+			</index>
+			<fk name="fk_FACT_OPEN_TAX_LOT_ACCOUNT" to_schema="DIMS" to_table="DIM_HT_FINANCIAL_ACCOUNT" >
+				<fk_column name="ACCOUNT_SK" pk="ACCOUNT_SK" />
+			</fk>
+			<fk name="fk_FACT_OPEN_TAX_LOT_SECURITY" to_schema="DIMS" to_table="DIM_ASSET" >
+				<fk_column name="SECURITY_SK" pk="SECURITY_SK" />
+			</fk>
+			<fk name="fk_FACT_OPEN_TAX_LOT_DATE" to_schema="DIMS" to_table="DIM_DATE" >
+				<fk_column name="DATE_SK" pk="DATE_SK" />
+			</fk>
+		</table>
+		<!-- DP-12: Monthly Billing Snapshot (source: Black Diamond MonthlyBillableValues) -->
+		<table name="FACT_MONTHLY_BILLING" >
+			<column name="ACCOUNT_SK" type="DATE" mandatory="y" />
+			<column name="DATE_SK" type="DATE" mandatory="y" />
+			<column name="BILLABLE_VALUE" type="NUMBER" mandatory="y" />
+			<column name="FEE_AMOUNT" type="NUMBER" mandatory="n" />
+			<index name="pk_FACT_MONTHLY_BILLING" unique="PRIMARY_KEY" >
+				<column name="ACCOUNT_SK" />
+				<column name="DATE_SK" />
+			</index>
+			<fk name="fk_FACT_MONTHLY_BILLING_ACCOUNT" to_schema="DIMS" to_table="DIM_HT_FINANCIAL_ACCOUNT" >
+				<fk_column name="ACCOUNT_SK" pk="ACCOUNT_SK" />
+			</fk>
+			<fk name="fk_FACT_MONTHLY_BILLING_DATE" to_schema="DIMS" to_table="DIM_DATE" >
+				<fk_column name="DATE_SK" pk="DATE_SK" />
+			</fk>
+		</table>
+		<!-- DP-14: Data Readiness and Reconciliation (source: Black Diamond ProcessState / DataProviders) -->
+		<table name="FACT_DATA_READINESS" >
+			<column name="DATAPROVIDER_SK" type="DATE" mandatory="y" />
+			<column name="DATE_SK" type="DATE" mandatory="y" />
+			<column name="PROCESS_STATE" type="VARCHAR" mandatory="y" />
+			<column name="RECORDS_LOADED" type="NUMBER" mandatory="n" />
+			<column name="RECONCILED_FLAG" type="BOOLEAN" mandatory="n" />
+			<index name="pk_FACT_DATA_READINESS" unique="PRIMARY_KEY" >
+				<column name="DATAPROVIDER_SK" />
+				<column name="DATE_SK" />
+			</index>
+			<fk name="fk_FACT_DATA_READINESS_DATAPROVIDER" to_schema="DIMS" to_table="DIM_DATAPROVIDER" >
+				<fk_column name="DATAPROVIDER_SK" pk="DATAPROVIDER_SK" />
+			</fk>
+			<fk name="fk_FACT_DATA_READINESS_DATE" to_schema="DIMS" to_table="DIM_DATE" >
+				<fk_column name="DATE_SK" pk="DATE_SK" />
+			</fk>
+		</table>
+		<!-- DP-15: Advisory Account Snapshot (multi-source advisory account / AUM snapshot) -->
+		<table name="FACT_ADVISORY_ACCOUNT" >
+			<column name="ACCOUNT_SK" type="DATE" mandatory="y" />
+			<column name="DATE_SK" type="DATE" mandatory="y" />
+			<column name="AUM_VALUE" type="NUMBER" mandatory="y" />
+			<column name="ADVISORY_FLAG" type="BOOLEAN" mandatory="n" />
+			<index name="pk_FACT_ADVISORY_ACCOUNT" unique="PRIMARY_KEY" >
+				<column name="ACCOUNT_SK" />
+				<column name="DATE_SK" />
+			</index>
+			<fk name="fk_FACT_ADVISORY_ACCOUNT_ACCOUNT" to_schema="DIMS" to_table="DIM_HT_FINANCIAL_ACCOUNT" >
+				<fk_column name="ACCOUNT_SK" pk="ACCOUNT_SK" />
+			</fk>
+			<fk name="fk_FACT_ADVISORY_ACCOUNT_DATE" to_schema="DIMS" to_table="DIM_DATE" >
+				<fk_column name="DATE_SK" pk="DATE_SK" />
+			</fk>
+		</table>
+		<!-- DP-16: Custody Snapshot (custody / SEC reporting snapshot) -->
+		<table name="FACT_CUSTODY" >
+			<column name="ACCOUNT_SK" type="DATE" mandatory="y" />
+			<column name="CUSTODIAN_SK" type="DATE" mandatory="y" />
+			<column name="DATE_SK" type="DATE" mandatory="y" />
+			<column name="CUSTODY_VALUE" type="NUMBER" mandatory="y" />
+			<index name="pk_FACT_CUSTODY" unique="PRIMARY_KEY" >
+				<column name="ACCOUNT_SK" />
+				<column name="CUSTODIAN_SK" />
+				<column name="DATE_SK" />
+			</index>
+			<fk name="fk_FACT_CUSTODY_ACCOUNT" to_schema="DIMS" to_table="DIM_HT_FINANCIAL_ACCOUNT" >
+				<fk_column name="ACCOUNT_SK" pk="ACCOUNT_SK" />
+			</fk>
+			<fk name="fk_FACT_CUSTODY_CUSTODIAN" to_schema="DIMS" to_table="DIM_CUSTODIAN" >
+				<fk_column name="CUSTODIAN_SK" pk="CUSTODIAN_SK" />
+			</fk>
+			<fk name="fk_FACT_CUSTODY_DATE" to_schema="DIMS" to_table="DIM_DATE" >
+				<fk_column name="DATE_SK" pk="DATE_SK" />
+			</fk>
+		</table>
+	</schema>
+	<schema name="BRIDGE" >
+		<!-- DP-13: Account Rep-Code Assignment (source: Black Diamond AccountRepCodes / RepCodes) -->
+		<table name="BRIDGE_ACCOUNT_REP_CODE" >
+			<column name="ACCOUNT_SK" type="DATE" mandatory="y" />
+			<column name="REP_CODE" type="VARCHAR" mandatory="y" />
+			<column name="EFFECTIVE_START_DATE" type="DATE" mandatory="y" />
+			<column name="EFFECTIVE_END_DATE" type="DATE" mandatory="n" />
+			<index name="pk_BRIDGE_ACCOUNT_REP_CODE" unique="PRIMARY_KEY" >
+				<column name="ACCOUNT_SK" />
+				<column name="REP_CODE" />
+				<column name="EFFECTIVE_START_DATE" />
+			</index>
+			<fk name="fk_BRIDGE_ACCOUNT_REP_CODE_ACCOUNT" to_schema="DIMS" to_table="DIM_HT_FINANCIAL_ACCOUNT" >
+				<fk_column name="ACCOUNT_SK" pk="ACCOUNT_SK" />
+			</fk>
+		</table>
+	</schema>
+	<diagram_group name="Default" id="c9eca579-fd22-4159-9915-f7b91e8ef7e9" >
+		<diagram name="Default Diagram" id="94275fbd-a649-4f41-9afe-e638fe55b3bf" show_relation="columns" >
+			<entity schema="DIMS" name="DIM_HT_FINANCIAL_ACCOUNT" color="3986C1" x="893" y="304" />
+			<entity schema="DIMS" name="DIM_AGREEMENT_ACCOUNT" color="3986C1" x="893" y="513" />
+			<entity schema="DIMS" name="DIM_ADVISOR_TEAM" color="3986C1" x="893" y="722" />
+			<entity schema="DIMS" name="DIM_CLIENT" color="3986C1" x="114" y="380" />
+			<entity schema="DIMS" name="DIM_CLIENT_AGREEMENT" color="3986C1" x="893" y="627" />
+			<entity schema="DIMS" name="DIM_DATE" color="C1D8EE" x="589" y="228" />
+			<entity schema="DIMS" name="DIM_HOUSEHOLD" color="3986C1" x="342" y="228" />
+			<entity schema="DIMS" name="DIM_ASSET" color="3986C1" x="114" y="600" />
+			<entity schema="DIMS" name="DIM_DATAPROVIDER" color="3986C1" x="1150" y="304" />
+			<entity schema="DIMS" name="DIM_CUSTODIAN" color="3986C1" x="1150" y="513" />
+			<entity schema="FACTS" name="FACT_ACCOUNT_VALUE_DAILY" color="C13939" x="589" y="450" />
+			<entity schema="FACTS" name="FACT_POSITIONS_MONTHLY" color="C13939" x="342" y="722" />
+			<entity schema="FACTS" name="FACT_DAILY_POSITION" color="C13939" x="342" y="900" />
+			<entity schema="FACTS" name="FACT_TRANSACTION_ACTIVITY" color="C13939" x="589" y="900" />
+			<entity schema="FACTS" name="FACT_OPEN_TAX_LOT" color="C13939" x="589" y="1050" />
+			<entity schema="FACTS" name="FACT_MONTHLY_BILLING" color="C13939" x="893" y="900" />
+			<entity schema="FACTS" name="FACT_DATA_READINESS" color="C13939" x="1150" y="722" />
+			<entity schema="FACTS" name="FACT_ADVISORY_ACCOUNT" color="C13939" x="893" y="1050" />
+			<entity schema="FACTS" name="FACT_CUSTODY" color="C13939" x="1150" y="900" />
+			<entity schema="BRIDGE" name="BRIDGE_ACCOUNT_REP_CODE" color="4CAF50" x="1150" y="1050" />
+			<callout x="57" y="57" pointer="Round" >
+				<comment><![CDATA[- Create new entities by right-clicking the diagram. 
+- Double-click entity headers to edit.
+- Get a better understanding of the schema by creating multiple diagrams.
+- Convert the logical design to physical design and deploy it into the database.]]></comment>
+			</callout>
+		</diagram>
+	</diagram_group>
+	<diagram_group name="By Fact Table" id="a1b2c3d4-0001-4000-8000-000000000001" >
+		<diagram name="FACT_ACCOUNT_VALUE_DAILY" id="a1b2c3d4-0002-4000-8000-000000000002" show_relation="columns" >
+			<entity schema="FACTS" name="FACT_ACCOUNT_VALUE_DAILY" color="C13939" x="400" y="200" />
+			<entity schema="DIMS" name="DIM_HT_FINANCIAL_ACCOUNT" color="3986C1" x="150" y="400" />
+			<entity schema="DIMS" name="DIM_DATE" color="C1D8EE" x="650" y="400" />
+		</diagram>
+		<diagram name="FACT_POSITIONS_MONTHLY" id="a1b2c3d4-0003-4000-8000-000000000003" show_relation="columns" >
+			<entity schema="FACTS" name="FACT_POSITIONS_MONTHLY" color="C13939" x="400" y="200" />
+			<entity schema="DIMS" name="DIM_HT_FINANCIAL_ACCOUNT" color="3986C1" x="150" y="400" />
+			<entity schema="DIMS" name="DIM_ASSET" color="3986C1" x="400" y="450" />
+			<entity schema="DIMS" name="DIM_DATE" color="C1D8EE" x="650" y="400" />
+		</diagram>
+		<diagram name="FACT_DAILY_POSITION" id="a1b2c3d4-0004-4000-8000-000000000004" show_relation="columns" >
+			<entity schema="FACTS" name="FACT_DAILY_POSITION" color="C13939" x="400" y="200" />
+			<entity schema="DIMS" name="DIM_HT_FINANCIAL_ACCOUNT" color="3986C1" x="150" y="400" />
+			<entity schema="DIMS" name="DIM_ASSET" color="3986C1" x="400" y="450" />
+			<entity schema="DIMS" name="DIM_DATE" color="C1D8EE" x="650" y="400" />
+		</diagram>
+		<diagram name="FACT_TRANSACTION_ACTIVITY" id="a1b2c3d4-0005-4000-8000-000000000005" show_relation="columns" >
+			<entity schema="FACTS" name="FACT_TRANSACTION_ACTIVITY" color="C13939" x="400" y="200" />
+			<entity schema="DIMS" name="DIM_HT_FINANCIAL_ACCOUNT" color="3986C1" x="150" y="400" />
+			<entity schema="DIMS" name="DIM_ASSET" color="3986C1" x="400" y="450" />
+			<entity schema="DIMS" name="DIM_DATE" color="C1D8EE" x="650" y="400" />
+		</diagram>
+		<diagram name="FACT_OPEN_TAX_LOT" id="a1b2c3d4-0006-4000-8000-000000000006" show_relation="columns" >
+			<entity schema="FACTS" name="FACT_OPEN_TAX_LOT" color="C13939" x="400" y="200" />
+			<entity schema="DIMS" name="DIM_HT_FINANCIAL_ACCOUNT" color="3986C1" x="150" y="400" />
+			<entity schema="DIMS" name="DIM_ASSET" color="3986C1" x="400" y="450" />
+			<entity schema="DIMS" name="DIM_DATE" color="C1D8EE" x="650" y="400" />
+		</diagram>
+		<diagram name="FACT_MONTHLY_BILLING" id="a1b2c3d4-0007-4000-8000-000000000007" show_relation="columns" >
+			<entity schema="FACTS" name="FACT_MONTHLY_BILLING" color="C13939" x="400" y="200" />
+			<entity schema="DIMS" name="DIM_HT_FINANCIAL_ACCOUNT" color="3986C1" x="150" y="400" />
+			<entity schema="DIMS" name="DIM_DATE" color="C1D8EE" x="650" y="400" />
+		</diagram>
+		<diagram name="FACT_DATA_READINESS" id="a1b2c3d4-0008-4000-8000-000000000008" show_relation="columns" >
+			<entity schema="FACTS" name="FACT_DATA_READINESS" color="C13939" x="400" y="200" />
+			<entity schema="DIMS" name="DIM_DATAPROVIDER" color="3986C1" x="150" y="400" />
+			<entity schema="DIMS" name="DIM_DATE" color="C1D8EE" x="650" y="400" />
+		</diagram>
+		<diagram name="FACT_ADVISORY_ACCOUNT" id="a1b2c3d4-0009-4000-8000-000000000009" show_relation="columns" >
+			<entity schema="FACTS" name="FACT_ADVISORY_ACCOUNT" color="C13939" x="400" y="200" />
+			<entity schema="DIMS" name="DIM_HT_FINANCIAL_ACCOUNT" color="3986C1" x="150" y="400" />
+			<entity schema="DIMS" name="DIM_DATE" color="C1D8EE" x="650" y="400" />
+		</diagram>
+		<diagram name="FACT_CUSTODY" id="a1b2c3d4-000a-4000-8000-00000000000a" show_relation="columns" >
+			<entity schema="FACTS" name="FACT_CUSTODY" color="C13939" x="400" y="200" />
+			<entity schema="DIMS" name="DIM_HT_FINANCIAL_ACCOUNT" color="3986C1" x="150" y="400" />
+			<entity schema="DIMS" name="DIM_CUSTODIAN" color="3986C1" x="650" y="400" />
+			<entity schema="DIMS" name="DIM_DATE" color="C1D8EE" x="400" y="450" />
+		</diagram>
+	</diagram_group>
+</project>
